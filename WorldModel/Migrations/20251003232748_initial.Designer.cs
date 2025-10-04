@@ -11,8 +11,8 @@ using WorldModel;
 namespace WorldModel.Migrations
 {
     [DbContext(typeof(Comp584Context))]
-    [Migration("20250927011447_golden")]
-    partial class golden
+    [Migration("20251003232748_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
