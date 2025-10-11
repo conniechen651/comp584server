@@ -16,6 +16,11 @@ public partial class City
     [Column("countryID")]
     public int CountryId { get; set; }
 
+    [Column("name")]
+    [StringLength(50)]
+    [Unicode(false)]
+    public string Name { get; set; } = null!;
+
     [Column("latitude")]
     public double Latitude { get; set; }
 

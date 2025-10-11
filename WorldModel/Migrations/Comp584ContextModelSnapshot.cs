@@ -42,6 +42,13 @@ namespace WorldModel.Migrations
                         .HasColumnType("float")
                         .HasColumnName("longitude");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("name");
+
                     b.Property<int>("Population")
                         .HasColumnType("int")
                         .HasColumnName("population");
