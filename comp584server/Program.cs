@@ -13,7 +13,7 @@ builder.Services.AddCors();
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<Comp584Context>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); //?? throw new InvalidOperationException("Connection string 'Comp584Database' not found."));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); 
 });
 builder.Services.AddSwaggerGen(c =>
 {
