@@ -2,6 +2,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ namespace comp584server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeedController(Comp584Context context, IHostEnvironment environment) : ControllerBase
+    public class SeedController(Comp584Context context, IHostEnvironment environment, 
+        RoleManager<IdentityRole> roleManager, UserManager<WorldModelUser> userManager, 
+        IConfiguration configuration) : ControllerBase
     {
         string _pathName = Path.Combine(environment.ContentRootPath, "Data/worldcities.csv");
         [HttpPost("Countries")]
@@ -23,8 +26,11 @@ namespace comp584server.Controllers
             Dictionary<string, Country> countries = await context.Countries.AsNoTracking()
                 .ToDictionaryAsync(c => c.Name, StringComparer.OrdinalIgnoreCase);
 
-            CsvConfiguration config = new(CultureInfo.InvariantCulture) { 
-                    HasHeaderRecord = true, HeaderValidated = null};
+            CsvConfiguration config = new(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                HeaderValidated = null
+            };
 
             using StreamReader reader = new(_pathName);
             using CsvReader csv = new(reader, config);
@@ -85,6 +91,47 @@ namespace comp584server.Controllers
             await context.SaveChangesAsync();
 
             return new JsonResult(cityCount);
+        }
+
+        [HttpPost("Users")]
+        public async Task<ActionResult> PostUsers()
+        {
+            string administrator = "administrator";
+            string registeredUser = "registeredUser";
+            if (!await roleManager.RoleExistsAsync(administrator))
+            {
+                await roleManager.CreateAsync(new IdentityRole(administrator));
+            }
+
+            if (!await roleManager.RoleExistsAsync(registeredUser))
+            {
+                await roleManager.CreateAsync(new IdentityRole(registeredUser));
+            }
+            WorldModelUser adminUser = new()
+            {
+                UserName = "admin",
+                Email = "connie.chen.490@gmail.com",
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            await userManager.CreateAsync(adminUser, configuration["DefaultPasswords:admin"]!);
+            await userManager.AddToRoleAsync(adminUser, administrator);
+
+            WorldModelUser regularUser = new()
+            {
+                UserName = "user",
+                Email = "connie.chen.490@my.csun.edu",
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            await userManager.CreateAsync(regularUser, configuration["DefaultPasswords:user"]!);
+            await userManager.AddToRoleAsync(regularUser, registeredUser);
+
+            return Ok();
         }
     }
 }
