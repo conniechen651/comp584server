@@ -1,3 +1,4 @@
+using comp584server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,8 @@ builder.Services.AddIdentity<WorldModelUser, IdentityRole>(options =>
     options.Password.RequireDigit = true;
 })
     .AddEntityFrameworkStores<Comp584Context>();
+
+builder.Services.AddScoped<JwtHandler>();
 
 builder.Services.AddSwaggerGen(c =>
 {
